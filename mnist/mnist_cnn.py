@@ -47,36 +47,42 @@ def main():
                 metrics=['accuracy'],
                 loss_weights=None,
                 sample_weight_mode=None, )
-
-    if (os.path.exists('mnist_model.h5')):
-        model = load_model('mnist_model.h5')
-    else:
-        model.fit(x_train, y_train,
+    model.fit(x_train, y_train,
                 batch_size=batch_size,
                 epochs=1,
                 verbose=1,
-                validation_data=(x_test, y_test))
-        model.save_weights('mnist_weights.h5') 
-        model.save("mnist_model.h5")
+                validation_data=(x_test, y_test),
+                callbacks=[keras.callbacks.TensorBoard()])
+    # if (os.path.exists('mnist_model.h5')):
+    #     model = load_model('mnist_model.h5')
+    # else:
+    #     model.fit(x_train, y_train,
+    #             batch_size=batch_size,
+    #             epochs=1,
+    #             verbose=1,
+    #             validation_data=(x_test, y_test),
+    #             callbacks=[keras.callbacks.TensorBoard()])
+    #     model.save_weights('mnist_weights.h5') 
+    #     model.save("mnist_model.h5")
     
-    # save data
-    sample = x_test[0]
-    sample = np.expand_dims(sample, axis=0)
-    weights = {}
-    outputs = {}
-    layer0 = model.layers[0].input
-    for layer in model.layers:
-        model_inter = Model(inputs=[layer0], outputs=[layer.output])
-        pred = model_inter.predict(sample)
-        outputs[layer.name]=pred[0].tolist()
-        weights[layer.name]=[w.tolist() for w in layer.get_weights()]
-        # print(pred[0].tolist())
-    with open("outputs_mnist.json","w") as json_file:
-        json.dump(outputs, json_file)
-    json_file.close()
-    with open("weights_mnist.json","w") as json_file:
-        json.dump(weights, json_file)
-    json_file.close()
+    # # save data
+    # sample = x_test[0]
+    # sample = np.expand_dims(sample, axis=0)
+    # weights = {}
+    # outputs = {}
+    # layer0 = model.layers[0].input
+    # for layer in model.layers:
+    #     model_inter = Model(inputs=[layer0], outputs=[layer.output])
+    #     pred = model_inter.predict(sample)
+    #     outputs[layer.name]=pred[0].tolist()
+    #     weights[layer.name]=[w.tolist() for w in layer.get_weights()]
+    #     # print(pred[0].tolist())
+    # with open("outputs_mnist.json","w") as json_file:
+    #     json.dump(outputs, json_file)
+    # json_file.close()
+    # with open("weights_mnist.json","w") as json_file:
+    #     json.dump(weights, json_file)
+    # json_file.close()
 
 if __name__=="__main__":
     main()

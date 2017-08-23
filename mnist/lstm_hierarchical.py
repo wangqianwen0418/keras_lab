@@ -4,7 +4,7 @@ from keras.models import Model
 from keras.layers import Input, Dense, TimeDistributed
 from keras.layers import LSTM
 import csv
-from datetime import time
+import datetime
 # Training parameters.
 batch_size = 32
 num_classes = 10
@@ -53,10 +53,10 @@ model.compile(loss='categorical_crossentropy',
 class MyCallback(keras.callbacks.Callback):
     field = ['acc', 'loss']
     def on_batch_end(self, batch, logs):
-        if(batch==1)：
+        if(batch==0):
             with open('/logs/log{}.csv'.format(str(datetime.date.today())), 'w') as f:
                 writer = csv.writer(f)
-                writer.writerow(fields)
+                writer.writerow(self.field)
                 writer.writerow([logs['acc'], logs['loss']])
             f.close()
         else:
@@ -66,21 +66,21 @@ class MyCallback(keras.callbacks.Callback):
             f.close()
 
 callback_1 = keras.callbacks.TensorBoard(
-    log_dir='./log_tensorboard', 
-    histogram_freq=0, 
+    log_dir='../vis/tensorboard/test', 
+    histogram_freq=1, 
     batch_size=32, 
     write_graph=True, 
     write_grads=False,
-     write_images=False, 
-     embeddings_freq=0, 
-     embeddings_layer_names=None, 
-     embeddings_metadata=None)
+    write_images=False, 
+    embeddings_freq=1, 
+    embeddings_layer_names=None, 
+    embeddings_metadata=None)
 
-callback_2 = MyCallback()
+# callback_2 = MyCallback()
 # Training.
 model.fit(x_train, y_train,
           batch_size=batch_size,
           epochs=epochs,
           verbose=1,
-          validation_data=(x_test, y_test)
-          callbacks=[callback_1, callback_2])
+          validation_data=(x_test, y_test),
+          callbacks=[callback_1])
